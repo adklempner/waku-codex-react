@@ -113,6 +113,17 @@ src/
 2. Start Codex node: `codex --api-port=8080`
 3. Configure the app to use local endpoint
 
+## Examples
+
+### Basic Waku Connection
+Validates that the Waku service can connect to the network:
+
+```bash
+npm run example:basic
+```
+
+Then open http://localhost:5173 to see the connection status and peer count.
+
 ## License
 
 MIT
