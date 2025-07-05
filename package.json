@@ -9,7 +9,9 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "example:basic": "vite --config vite.config.examples.ts"
+    "example:basic": "vite --config vite.config.examples.ts",
+    "dev:miniapp": "vite --config vite.config.miniapp.ts",
+    "build:miniapp": "tsc && vite build --config vite.config.miniapp.ts"
   },
   "keywords": [
     "waku",
@@ -22,6 +24,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@farcaster/miniapp-sdk": "^0.1.2",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.6.0",
