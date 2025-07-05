@@ -1,0 +1,19 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjM4NjM5MCwidHlwZSI6ImF1dGgiLCJrZXkiOiIweDIzQzUxZTY0NDI3RjQxZDU1YzE5NUVmMTY3RThhM0Y3NzNGYUZFYjMifQ",
+    "payload": "eyJkb21haW4iOiJyaGV0b3JpYy5zcGFjZSJ9",
+    "signature": "xkRJY1OAfeNElERQAQszwkLWnlqtPRWgbMfq7g5uKvVVwVYBJbiWOg0rpoqXCl7RmaxboHJnhBgJznKTSwDHUxs="
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "rhetoric",
+    "iconUrl": "https://www.rhetoric.space/icon.png",
+    "homeUrl": "https://www.rhetoric.space",
+    "splashImageUrl": "https://www.rhetoric.space/splash.png",
+    "splashBackgroundColor": "#0a0a0a",
+    "subtitle": "online opinionated publication",
+    "description": "curated essays, fiction, and more",
+    "primaryCategory": "news-media",
+    "tags": ["essays", "fiction", "journal", "non-fiction", "blog"]
+  }
+}

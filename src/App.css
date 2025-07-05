@@ -35,14 +35,27 @@ h3 {
 .status-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: 2rem;
   margin-bottom: 1rem;
 }
 
 .status-item {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 0.5rem;
+}
+
+.status-item > span:first-child {
+  font-weight: 600;
+}
+
+.service-buttons {
+  margin-top: 0.5rem;
+}
+
+.service-buttons button {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.875rem;
 }
 
 .status-badge {

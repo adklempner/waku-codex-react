@@ -9,23 +9,6 @@ function App() {
   const { downloads, download } = useFileDownload();
   const [cid, setCid] = useState('');
 
-  const handleConnect = async () => {
-    try {
-      await waku.connect();
-      await codex.connect();
-    } catch (error) {
-      console.error('Connection failed:', error);
-    }
-  };
-
-  const handleDisconnect = async () => {
-    try {
-      await waku.disconnect();
-      await codex.disconnect();
-    } catch (error) {
-      console.error('Disconnect failed:', error);
-    }
-  };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -60,20 +43,27 @@ function App() {
             <span>Waku:</span>
             <span className={`status-badge ${waku.status}`}>{waku.status}</span>
             {waku.service && <span>({waku.service.peers} peers)</span>}
+            <div className="service-buttons">
+              {(waku.status === 'idle' || waku.status === 'disconnected') && (
+                <button onClick={() => waku.connect()}>Connect Waku</button>
+              )}
+              {waku.status === 'connected' && (
+                <button onClick={() => waku.disconnect()}>Disconnect Waku</button>
+              )}
+            </div>
           </div>
           <div className="status-item">
             <span>Codex:</span>
             <span className={`status-badge ${codex.status}`}>{codex.status}</span>
+            <div className="service-buttons">
+              {(codex.status === 'idle' || codex.status === 'disconnected') && (
+                <button onClick={() => codex.connect()}>Connect Codex</button>
+              )}
+              {codex.status === 'connected' && (
+                <button onClick={() => codex.disconnect()}>Disconnect Codex</button>
+              )}
+            </div>
           </div>
-        </div>
-        
-        <div className="button-group">
-          {(waku.status === 'idle' || waku.status === 'disconnected') && (
-            <button onClick={handleConnect}>Connect Services</button>
-          )}
-          {(waku.status === 'connected' || codex.status === 'connected') && (
-            <button onClick={handleDisconnect}>Disconnect</button>
-          )}
         </div>
         
         {(waku.error || codex.error) && (
