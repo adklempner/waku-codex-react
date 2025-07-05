@@ -1,0 +1,6 @@
+# Placeholder for splash.png
+# Requirements:
+# - Larger image for splash screen
+# - PNG format
+# - Should match splashBackgroundColor (#8b5cf6)
+# - Will be shown while app loads
