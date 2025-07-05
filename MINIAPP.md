@@ -76,6 +76,21 @@ Main application component that:
 
 ## Testing in Farcaster
 
+### Using the Test Environment
+
+We've included a test environment that simulates the Farcaster miniapp context:
+
+1. Start the miniapp dev server: `npm run dev:miniapp`
+2. Open `examples/miniapp-test/index.html` in your browser
+3. The test environment will:
+   - Show your app in a phone-like frame
+   - Inject a mock Farcaster SDK
+   - Allow you to customize user info and launch context
+   - Simulate primary button clicks
+   - Log all SDK interactions
+
+### Testing in Real Farcaster
+
 1. Start the development server: `npm run dev:miniapp`
 2. Use a tunneling service like ngrok to expose your local server
 3. Add your miniapp URL to Farcaster for testing

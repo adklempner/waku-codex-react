@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import sdk from '@farcaster/miniapp-sdk';
 import { FarcasterMiniapp, useFarcasterContext } from './components/FarcasterMiniapp';
 import { useWaku, useCodex, useFileUpload, useFileDownload } from '@/hooks';
 import { Context } from '@farcaster/miniapp-sdk';
@@ -11,6 +12,45 @@ function MiniAppContent() {
   const { uploads, upload } = useFileUpload();
   const { downloads, download } = useFileDownload();
   const [cid, setCid] = useState('');
+  const [primaryButtonText, setPrimaryButtonText] = useState('Share');
+
+  // Set up primary button when in miniapp
+  useEffect(() => {
+    if (!isInMiniApp) return;
+
+    // Configure primary button
+    sdk.actions.setPrimaryButton({
+      text: primaryButtonText,
+    });
+
+    // Listen for button clicks
+    const handlePrimaryClick = () => {
+      // Share the most recent upload
+      const lastUpload = uploads.find(u => u.status === 'completed' && u.cid);
+      if (lastUpload && lastUpload.cid) {
+        shareFile(lastUpload.cid, lastUpload.file.name);
+      }
+    };
+
+    sdk.on('primaryButtonClicked', handlePrimaryClick);
+
+    return () => {
+      sdk.off('primaryButtonClicked', handlePrimaryClick);
+    };
+  }, [isInMiniApp, primaryButtonText, uploads]);
+
+  const shareFile = async (cid: string, fileName: string) => {
+    if (!isInMiniApp) return;
+
+    try {
+      // Compose a cast with the file info
+      await sdk.actions.composeCast({
+        text: `Check out this file I uploaded using Waku-Codex:\n\nFile: ${fileName}\nCID: ${cid}\n\nAccess it at rhetoric.space`,
+      });
+    } catch (error) {
+      console.error('Failed to share:', error);
+    }
+  };
 
   const handleConnect = async () => {
     try {
@@ -37,6 +77,11 @@ function MiniAppContent() {
     try {
       const result = await upload(file);
       console.log('Upload complete:', result);
+      
+      // Update primary button when upload completes
+      if (isInMiniApp && result.cid) {
+        setPrimaryButtonText(`Share ${file.name}`);
+      }
     } catch (error) {
       console.error('Upload failed:', error);
     }
@@ -52,9 +97,17 @@ function MiniAppContent() {
     }
   };
 
+  // Apply safe area insets if in miniapp
+  const safeAreaStyle = isInMiniApp && context?.client?.safeAreaInsets ? {
+    paddingTop: context.client.safeAreaInsets.top,
+    paddingBottom: context.client.safeAreaInsets.bottom,
+    paddingLeft: context.client.safeAreaInsets.left,
+    paddingRight: context.client.safeAreaInsets.right,
+  } : {};
+
   return (
-    <div className="app">
-      <h1>Waku-Codex Farcaster MiniApp</h1>
+    <div className="app" style={safeAreaStyle}>
+      <h1>Waku-Codex {isInMiniApp ? 'Farcaster MiniApp' : 'App'}</h1>
       
       {isInMiniApp && context && (
         <div style={{ 
@@ -63,10 +116,22 @@ function MiniAppContent() {
           borderRadius: '8px',
           marginBottom: '20px' 
         }}>
-          <p>👋 Welcome, {context.user.displayName || context.user.username}!</p>
-          <p style={{ fontSize: '12px', color: '#666' }}>
-            FID: {context.user.fid}
-          </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div>
+              <p style={{ margin: 0 }}>
+                👋 Welcome, {context.user.displayName || context.user.username}!
+              </p>
+              <p style={{ fontSize: '12px', color: '#666', margin: 0 }}>
+                FID: {context.user.fid}
+              </p>
+            </div>
+          </div>
+          
+          {context.location && (
+            <p style={{ fontSize: '11px', color: '#888', marginTop: '8px' }}>
+              Opened from: {context.location.type.replace(/_/g, ' ')}
+            </p>
+          )}
         </div>
       )}
       
@@ -120,7 +185,21 @@ function MiniAppContent() {
                   <progress value={upload.progress} max="100" />
                 )}
                 {upload.cid && (
-                  <code className="cid">{upload.cid}</code>
+                  <>
+                    <code className="cid">{upload.cid}</code>
+                    {isInMiniApp && (
+                      <button 
+                        onClick={() => shareFile(upload.cid!, upload.file.name)}
+                        style={{ 
+                          padding: '4px 8px', 
+                          fontSize: '12px',
+                          marginLeft: '8px' 
+                        }}
+                      >
+                        Share
+                      </button>
+                    )}
+                  </>
                 )}
                 {upload.error && (
                   <span className="error">{upload.error.message}</span>
@@ -167,6 +246,26 @@ function MiniAppContent() {
           </div>
         )}
       </div>
+
+      {isInMiniApp && (
+        <div style={{ 
+          marginTop: '20px', 
+          padding: '10px', 
+          background: '#f9f9f9', 
+          borderRadius: '8px',
+          fontSize: '12px',
+          color: '#666' 
+        }}>
+          <p style={{ margin: '0 0 5px 0' }}>
+            <strong>MiniApp Features:</strong>
+          </p>
+          <ul style={{ margin: 0, paddingLeft: '20px' }}>
+            <li>Use the primary button at the top to share uploaded files</li>
+            <li>Safe area insets are applied for mobile devices</li>
+            <li>Your Farcaster profile is automatically loaded</li>
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
@@ -174,6 +273,10 @@ function MiniAppContent() {
 export function MiniApp() {
   const handleReady = (context: Context.MiniAppContext) => {
     console.log('Farcaster miniapp ready!', context);
+    
+    // Log launch context
+    console.log('Launched from:', context.location?.type);
+    console.log('User:', context.user);
   };
 
   const handleError = (error: Error) => {
